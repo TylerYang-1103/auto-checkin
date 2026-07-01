@@ -92,7 +92,7 @@ function checkAndTriggerCheckin(courses, now) {
 
     if (course.dayOfWeek === currentDay && courseMinutes === currentMinutes) {
       // 匹配成功，跳转到签到链接
-      window.location.href = course.url;
+      window.open(course.url, '_blank');
       return true;
     }
   }

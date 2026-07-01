@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/auto-checkin/',
+  // 根路径 — 适配 Vercel 部署（GitHub Pages 用 /auto-checkin/）
+  base: '/',
   server: {
     port: 3000,
     open: true,

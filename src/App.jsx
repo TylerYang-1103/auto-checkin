@@ -29,6 +29,8 @@ export default function App() {
   const [position, setPosition] = useState(null);
   // 提示消息状态
   const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+  // 页面动画状态
+  const [pageVisible, setPageVisible] = useState(false);
 
   // 签到调度器
   const { nextCourse, countdown, isChecking, refresh } = useCheckinScheduler();
@@ -36,10 +38,11 @@ export default function App() {
   // 反地理编码
   const { locationInfo, loading: locationLoading, fetchLocationInfo } = useReverseGeocode();
 
-  // 初始化：加载课程数据
+  // 初始化：加载课程数据 & 入场动画
   useEffect(() => {
     const savedCourses = getCourses();
     setCourses(savedCourses);
+    requestAnimationFrame(() => setPageVisible(true));
   }, []);
 
   /**
@@ -184,49 +187,57 @@ export default function App() {
   }, [showMessage, refresh]);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f2f5f9' }}>
-
-      {/* Header — 深色 Hero 区 */}
+    <div
+      className={`min-h-screen transition-opacity duration-500 ${pageVisible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      {/* Header — 毛玻璃导航栏 */}
       <header
-        className="sticky top-0 z-50 border-b"
+        className="sticky top-0 z-50"
         style={{
-          backgroundColor: '#111318',
-          borderColor: 'rgba(255,255,255,0.06)',
+          background: 'rgba(255, 255, 255, 0.72)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.25)',
         }}
       >
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <h1
-            className="text-white hero-title-weight"
-            style={{ fontSize: 22, letterSpacing: '-0.02em' }}
-          >
-            AUTO_CHECKIN
-            <span className="animate-pulse ml-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>_</span>
-          </h1>
-          <button
-            onClick={handleClearAll}
-            disabled={courses.length === 0}
-            className="pill px-3 py-1.5 text-xs transition-all duration-200 disabled:opacity-30"
-            style={{
-              color: 'rgba(255,255,255,0.45)',
-              backgroundColor: 'rgba(255,255,255,0.06)',
-            }}
-            onMouseEnter={(e) => {
-              if (!courses.length) return;
-              e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
-              e.target.style.color = 'rgba(255,255,255,0.8)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'rgba(255,255,255,0.06)';
-              e.target.style.color = 'rgba(255,255,255,0.45)';
-            }}
-          >
-            清除
-          </button>
+        <div className="max-w-2xl mx-auto px-5 h-16 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold"
+              style={{
+                background: 'linear-gradient(135deg, #4b6bff 0%, #7c3aed 100%)',
+                boxShadow: '0 2px 8px rgba(75, 107, 255, 0.25)',
+              }}
+            >
+              A
+            </div>
+            <h1
+              className="font-display font-semibold tracking-tight"
+              style={{ fontSize: 18, color: '#1a1e2e', letterSpacing: '-0.03em' }}
+            >
+              Auto Checkin
+            </h1>
+          </div>
+
+          {/* 操作区 */}
+          <div className="flex items-center gap-2">
+            {courses.length > 0 && (
+              <button
+                onClick={handleClearAll}
+                disabled={courses.length === 0}
+                className="glass-button px-3.5 py-1.5 text-xs font-medium disabled:opacity-30"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                清空
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Content */}
-      <div className="max-w-lg mx-auto px-4 py-4 pb-24">
+      <main className="max-w-2xl mx-auto px-5 py-5 pb-28 page-enter">
         {/* CheckinStatus */}
         <CheckinStatus
           nextCourse={nextCourse}
@@ -243,29 +254,36 @@ export default function App() {
           onEdit={handleOpenEdit}
           onDelete={handleDeleteCourse}
         />
-      </div>
+      </main>
 
-      {/* 底部定位信息 — 经度 + 纬度（城市·区） */}
+      {/* 底部定位信息 — 毛玻璃栏 */}
       {locationGranted && position && (
         <div
-          className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3"
-          style={{ backgroundColor: '#f7f9fc', borderTop: '1px solid rgba(15,23,42,0.08)' }}
+          className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom"
+          style={{
+            background: 'rgba(255, 255, 255, 0.72)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.25)',
+          }}
         >
-          <div className="max-w-lg mx-auto flex items-center justify-center gap-2 text-xs" style={{ color: 'rgba(0,0,0,0.48)', fontFamily: "'SF Mono', 'JetBrains Mono', ui-monospace, monospace" }}>
-            <span>纬度: {position.lat.toFixed(6)}</span>
-            <span style={{ color: 'rgba(0,0,0,0.2)' }}>|</span>
-            <span>经度: {position.lng.toFixed(6)}</span>
+          <div className="max-w-2xl mx-auto px-5 py-3 flex items-center justify-center gap-3">
+            <span className="font-mono text-xs" style={{ color: 'var(--text-tertiary)' }}>
+              {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+            </span>
             {locationInfo ? (
               <>
-                <span style={{ color: 'rgba(0,0,0,0.2)' }}>|</span>
-                <span style={{ color: 'rgba(0,0,0,0.62)' }}>
+                <span style={{ color: 'var(--text-tertiary)', opacity: 0.5 }}>·</span>
+                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                   {locationInfo.city}{locationInfo.district ? ` · ${locationInfo.district}` : ''}
                 </span>
               </>
             ) : locationLoading ? (
               <>
-                <span style={{ color: 'rgba(0,0,0,0.2)' }}>|</span>
-                <span className="animate-pulse" style={{ color: 'rgba(0,0,0,0.48)' }}>解析位置中...</span>
+                <span style={{ color: 'var(--text-tertiary)', opacity: 0.5 }}>·</span>
+                <span className="text-xs animate-pulse-soft" style={{ color: 'var(--text-tertiary)' }}>
+                  解析位置中...
+                </span>
               </>
             ) : null}
           </div>
@@ -275,20 +293,13 @@ export default function App() {
       {/* FAB 添加按钮 */}
       <button
         onClick={handleOpenAdd}
-        className="fixed bottom-20 right-6 z-50 w-12 h-12 rounded-full
-          flex items-center justify-center
-          text-white text-xl
-          transition-all duration-200
-          shadow-sm hover:shadow-md"
-        style={{ backgroundColor: '#111318' }}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = '#4b6bff';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = '#111318';
-        }}
+        className="fab fixed bottom-24 right-6 z-50"
+        aria-label="添加课程"
       >
-        +
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
       </button>
 
       {/* CourseForm Dialog */}
@@ -302,10 +313,7 @@ export default function App() {
       {/* Snackbar 轻提示 */}
       {snackbar.open && (
         <div
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50
-            px-5 py-2.5 snackbar-toast
-            text-sm animate-fadeIn cursor-pointer"
-          style={{ color: 'rgba(0,0,0,0.7)', fontWeight: 500 }}
+          className="snackbar"
           onClick={handleCloseSnackbar}
         >
           {snackbar.message}

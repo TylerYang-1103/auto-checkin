@@ -184,112 +184,133 @@ export default function App() {
   }, [showMessage, refresh]);
 
   return (
-    <>
-      {/* Matrix 背景 */}
-      <div className="matrix-bg" />
+    <div className="min-h-screen" style={{ backgroundColor: '#f2f5f9' }}>
 
-      {/* Main Container */}
-      <div className="min-h-screen relative z-10">
-
-        {/* Header — Linear 风格 */}
-        <header className="border-b border-[rgba(0,255,65,0.1)] bg-[rgba(10,10,10,0.8)] backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-            <h1 className="text-[#00ff41] text-lg font-semibold tracking-wider neon-text">
-              {`> AUTO_CHECKIN`}
-              <span className="animate-pulse ml-1">_</span>
-            </h1>
-            <button
-              onClick={handleClearAll}
-              disabled={courses.length === 0}
-              className="text-[#666] hover:text-[#ff4444] transition-colors text-sm font-mono disabled:opacity-30"
-            >
-              ~ $ clear
-            </button>
-          </div>
-        </header>
-
-        {/* Content */}
-        <div className="max-w-lg mx-auto px-4 py-4 pb-24">
-          {/* CheckinStatus */}
-          <CheckinStatus
-            nextCourse={nextCourse}
-            countdown={countdown}
-            isChecking={isChecking}
-            onRequestLocation={handleRequestLocation}
-            locationGranted={locationGranted}
-            position={position}
-          />
-
-          {/* CourseList */}
-          <CourseList
-            courses={courses}
-            onEdit={handleOpenEdit}
-            onDelete={handleDeleteCourse}
-          />
+      {/* Header — 深色 Hero 区 */}
+      <header
+        className="sticky top-0 z-50 border-b"
+        style={{
+          backgroundColor: '#111318',
+          borderColor: 'rgba(255,255,255,0.06)',
+        }}
+      >
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+          <h1
+            className="text-white hero-title-weight"
+            style={{ fontSize: 22, letterSpacing: '-0.02em' }}
+          >
+            AUTO_CHECKIN
+            <span className="animate-pulse ml-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>_</span>
+          </h1>
+          <button
+            onClick={handleClearAll}
+            disabled={courses.length === 0}
+            className="pill px-3 py-1.5 text-xs transition-all duration-200 disabled:opacity-30"
+            style={{
+              color: 'rgba(255,255,255,0.45)',
+              backgroundColor: 'rgba(255,255,255,0.06)',
+            }}
+            onMouseEnter={(e) => {
+              if (!courses.length) return;
+              e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
+              e.target.style.color = 'rgba(255,255,255,0.8)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'rgba(255,255,255,0.06)';
+              e.target.style.color = 'rgba(255,255,255,0.45)';
+            }}
+          >
+            清除
+          </button>
         </div>
+      </header>
 
-        {/* 底部定位信息 — 经度 + 纬度（城市·区） */}
-        {locationGranted && position && (
-          <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-[rgba(10,10,10,0.9)] border-t border-[rgba(0,255,65,0.1)] backdrop-blur-md">
-            <div className="max-w-lg mx-auto flex items-center justify-center gap-2 font-mono text-xs text-[#888]">
-              <span className="text-[#00ff41]">◆</span>
-              <span>纬度: {position.lat.toFixed(6)}</span>
-              <span className="text-[#666]">|</span>
-              <span>经度: {position.lng.toFixed(6)}</span>
-              {locationInfo ? (
-                <>
-                  <span className="text-[#666]">|</span>
-                  <span className="text-[#00d4ff]">
-                    ({locationInfo.city}{locationInfo.district ? ` · ${locationInfo.district}` : ''})
-                  </span>
-                </>
-              ) : locationLoading ? (
-                <>
-                  <span className="text-[#666]">|</span>
-                  <span className="text-[#666] animate-pulse">解析位置中...</span>
-                </>
-              ) : null}
-            </div>
-          </div>
-        )}
-
-        {/* FAB 添加按钮 */}
-        <button
-          onClick={handleOpenAdd}
-          className="fixed bottom-20 right-6 z-50 w-14 h-14 rounded-full
-            bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)]
-            text-[#00ff41] text-2xl font-mono
-            hover:bg-[rgba(0,255,65,0.2)] hover:border-[#00ff41]
-            hover:shadow-[0_0_20px_rgba(0,255,65,0.3)]
-            transition-all duration-300
-            flex items-center justify-center
-            backdrop-blur-md"
-        >
-          +
-        </button>
-
-        {/* CourseForm Dialog */}
-        <CourseForm
-          open={formOpen}
-          course={editingCourse}
-          onSave={handleSaveCourse}
-          onClose={handleCloseForm}
+      {/* Content */}
+      <div className="max-w-lg mx-auto px-4 py-4 pb-24">
+        {/* CheckinStatus */}
+        <CheckinStatus
+          nextCourse={nextCourse}
+          countdown={countdown}
+          isChecking={isChecking}
+          onRequestLocation={handleRequestLocation}
+          locationGranted={locationGranted}
+          position={position}
         />
 
-        {/* Snackbar 换成自定义轻提示 */}
-        {snackbar.open && (
-          <div
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-50
-              px-4 py-2 rounded-lg font-mono text-sm
-              bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)]
-              text-[#00ff41] backdrop-blur-md
-              animate-fadeIn cursor-pointer"
-            onClick={handleCloseSnackbar}
-          >
-            $ {snackbar.message}
-          </div>
-        )}
+        {/* CourseList */}
+        <CourseList
+          courses={courses}
+          onEdit={handleOpenEdit}
+          onDelete={handleDeleteCourse}
+        />
       </div>
-    </>
+
+      {/* 底部定位信息 — 经度 + 纬度（城市·区） */}
+      {locationGranted && position && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3"
+          style={{ backgroundColor: '#f7f9fc', borderTop: '1px solid rgba(15,23,42,0.08)' }}
+        >
+          <div className="max-w-lg mx-auto flex items-center justify-center gap-2 text-xs" style={{ color: 'rgba(0,0,0,0.48)', fontFamily: "'SF Mono', 'JetBrains Mono', ui-monospace, monospace" }}>
+            <span>纬度: {position.lat.toFixed(6)}</span>
+            <span style={{ color: 'rgba(0,0,0,0.2)' }}>|</span>
+            <span>经度: {position.lng.toFixed(6)}</span>
+            {locationInfo ? (
+              <>
+                <span style={{ color: 'rgba(0,0,0,0.2)' }}>|</span>
+                <span style={{ color: 'rgba(0,0,0,0.62)' }}>
+                  {locationInfo.city}{locationInfo.district ? ` · ${locationInfo.district}` : ''}
+                </span>
+              </>
+            ) : locationLoading ? (
+              <>
+                <span style={{ color: 'rgba(0,0,0,0.2)' }}>|</span>
+                <span className="animate-pulse" style={{ color: 'rgba(0,0,0,0.48)' }}>解析位置中...</span>
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* FAB 添加按钮 */}
+      <button
+        onClick={handleOpenAdd}
+        className="fixed bottom-20 right-6 z-50 w-12 h-12 rounded-full
+          flex items-center justify-center
+          text-white text-xl
+          transition-all duration-200
+          shadow-sm hover:shadow-md"
+        style={{ backgroundColor: '#111318' }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#4b6bff';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = '#111318';
+        }}
+      >
+        +
+      </button>
+
+      {/* CourseForm Dialog */}
+      <CourseForm
+        open={formOpen}
+        course={editingCourse}
+        onSave={handleSaveCourse}
+        onClose={handleCloseForm}
+      />
+
+      {/* Snackbar 轻提示 */}
+      {snackbar.open && (
+        <div
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50
+            px-5 py-2.5 snackbar-toast
+            text-sm animate-fadeIn cursor-pointer"
+          style={{ color: 'rgba(0,0,0,0.7)', fontWeight: 500 }}
+          onClick={handleCloseSnackbar}
+        >
+          {snackbar.message}
+        </div>
+      )}
+    </div>
   );
 }

@@ -22,33 +22,32 @@ export default function CheckinStatus({
   position,
 }) {
   return (
-    <div className="glass-card p-4 mb-4">
+    <div className="panel-white p-4 mb-4">
       {/* 状态行 */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span
-            className={`w-2 h-2 rounded-full ${
-              isChecking
-                ? 'bg-[#00ff41] shadow-[0_0_6px_rgba(0,255,65,0.8)]'
-                : 'bg-[#666]'
-            }`}
+            className={`status-dot ${isChecking ? 'status-dot-active' : 'status-dot-inactive'}`}
           />
-          <span className="text-xs font-mono text-[#888]">
+          <span className="text-xs" style={{ color: 'rgba(0,0,0,0.62)', fontWeight: 400 }}>
             {isChecking ? 'STATUS: ACTIVE' : 'STATUS: STOPPED'}
-          </span>
-          <span className="text-[10px] font-mono text-[#555]">
-            /* {isChecking ? 'checking every 1s' : 'idle'} */
           </span>
         </div>
 
         <button
           onClick={onRequestLocation}
-          className={`text-xs font-mono px-3 py-1 rounded border transition-all
-            ${
-              locationGranted
-                ? 'border-[rgba(0,255,65,0.3)] text-[#00ff41] bg-[rgba(0,255,65,0.05)]'
-                : 'border-[rgba(0,212,255,0.3)] text-[#00d4ff] hover:bg-[rgba(0,212,255,0.05)]'
-            }`}
+          className="pill px-3 py-1.5 text-xs font-medium transition-all duration-200"
+          style={{
+            color: locationGranted ? '#4b6bff' : '#4b6bff',
+            backgroundColor: locationGranted ? 'rgba(75,107,255,0.06)' : 'transparent',
+            border: `1px solid ${locationGranted ? '#4b6bff' : 'rgba(75,107,255,0.4)'}`,
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = 'rgba(75,107,255,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = locationGranted ? 'rgba(75,107,255,0.06)' : 'transparent';
+          }}
         >
           {locationGranted ? 'GPS: LOCKED' : 'REQUEST GPS_'}
         </button>
@@ -56,28 +55,34 @@ export default function CheckinStatus({
 
       {/* 下一个课程 */}
       {nextCourse ? (
-        <div className="border-t border-[rgba(0,255,65,0.08)] pt-3">
-          <div className="text-[10px] font-mono text-[#555] uppercase tracking-widest mb-1">
+        <div style={{ borderTop: '1px solid rgba(15,23,42,0.06)' }} className="pt-3">
+          <div
+            className="text-xs mb-1.5"
+            style={{ color: 'rgba(0,0,0,0.48)', fontWeight: 540, letterSpacing: '0.03em' }}
+          >
             Next Check-in_
           </div>
-          <div className="text-sm font-mono text-[#c0c0c0] truncate">
+          <div className="text-sm truncate" style={{ color: 'rgba(0,0,0,0.7)', fontWeight: 500 }}>
             {nextCourse.course.name}
-            <span className="text-[#666]">
+            <span style={{ color: 'rgba(0,0,0,0.48)' }}>
               {' '}
-              // {DAY_NAMES[nextCourse.course.dayOfWeek]}{' '}
+              {DAY_NAMES[nextCourse.course.dayOfWeek]}{' '}
               {nextCourse.course.time}
             </span>
           </div>
-          <div className="mt-2 text-2xl font-mono font-bold text-[#00ff41] neon-text tracking-wider">
+          <div
+            className="mt-2 tracking-tight section-title-weight"
+            style={{ fontSize: 22, fontWeight: 620, color: '#111318', letterSpacing: '-0.02em' }}
+          >
             {'>'} {countdown}
           </div>
         </div>
       ) : (
-        <div className="border-t border-[rgba(0,255,65,0.08)] pt-3">
-          <div className="text-xs font-mono text-[#555]">
+        <div style={{ borderTop: '1px solid rgba(15,23,42,0.06)' }} className="pt-3">
+          <div className="text-xs" style={{ color: 'rgba(0,0,0,0.62)' }}>
             $ no upcoming courses scheduled
           </div>
-          <div className="text-[10px] font-mono text-[#444] mt-1">
+          <div className="text-xs mt-1" style={{ color: 'rgba(0,0,0,0.38)' }}>
             /* add a course to begin */
           </div>
         </div>

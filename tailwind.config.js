@@ -8,7 +8,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'monospace'],
+        sans: ['SF Pro Display', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'system-ui', 'sans-serif'],
+        mono: ['SF Mono', 'JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       keyframes: {
         fadeIn: {

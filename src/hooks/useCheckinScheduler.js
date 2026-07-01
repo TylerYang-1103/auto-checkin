@@ -91,8 +91,14 @@ function checkAndTriggerCheckin(courses, now) {
     const courseMinutes = hours * 60 + minutes;
 
     if (course.dayOfWeek === currentDay && courseMinutes === currentMinutes) {
-      // 匹配成功，跳转到签到链接
-      window.open(course.url, '_blank');
+      // 匹配成功，通过创建并点击 <a> 元素在新标签页打开链接
+      const link = document.createElement('a');
+      link.href = course.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       return true;
     }
   }
@@ -132,10 +138,7 @@ export function useCheckinScheduler() {
     const currentMinuteKey = `${now.getDay()}-${now.getHours()}-${now.getMinutes()}`;
     if (lastCheckedMinuteRef.current !== currentMinuteKey) {
       lastCheckedMinuteRef.current = currentMinuteKey;
-      const triggered = checkAndTriggerCheckin(courses, now);
-      if (triggered) {
-        setIsChecking(false);
-      }
+      checkAndTriggerCheckin(courses, now);
     }
   }, []);
 

@@ -39,20 +39,25 @@ function setFakeTime(year, month, day, hour, min, sec = 0) {
 }
 
 describe('useCheckinScheduler - 签到调度器', () => {
-  let originalLocation;
-
   beforeEach(() => {
     vi.useFakeTimers();
-    originalLocation = window.location;
-    // 模拟 window.location（只保留 href 可写）
-    delete window.location;
-    window.location = { href: '' };
     vi.clearAllMocks();
+    // Mock document.createElement 使 <a> 元素具有可 spy 的 click 方法
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+      const el = originalCreateElement(tagName);
+      if (tagName === 'a') {
+        el.click = vi.fn();
+      }
+      return el;
+    });
+    vi.spyOn(document.body, 'appendChild').mockImplementation((el) => el);
+    vi.spyOn(document.body, 'removeChild').mockImplementation((el) => el);
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    window.location = originalLocation;
+    vi.restoreAllMocks();
   });
 
   describe('getNextCourse 逻辑（通过 hook 输出验证）', () => {
@@ -137,7 +142,7 @@ describe('useCheckinScheduler - 签到调度器', () => {
   });
 
   describe('checkAndTriggerCheckin - 触发跳转', () => {
-    it('在当前时间匹配课程时触发 window.location.href 跳转', () => {
+    it('在当前时间匹配课程时通过创建 anchor 元素在新标签页打开链接', () => {
       // 当前时间: 2026-07-06 周一 08:00:00（精确匹配）
       const now = new Date(2026, 6, 6, 8, 0, 0);
       vi.setSystemTime(now);
@@ -154,8 +159,23 @@ describe('useCheckinScheduler - 签到调度器', () => {
         vi.advanceTimersByTime(0);
       });
 
-      // 初始 tick 应该触发 checkAndTriggerCheckin，跳转到课程 URL
-      expect(window.location.href).toBe('https://example.com/checkin');
+      // 验证 document.createElement 被调用创建了一个 <a> 元素
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      // 验证 appendChild 被调用
+      expect(document.body.appendChild).toHaveBeenCalled();
+      // 验证 removeChild 被调用
+      expect(document.body.removeChild).toHaveBeenCalled();
+
+      // 验证创建的 anchor 元素属性
+      // 在 appendChild 调用中查找添加的 <a> 元素（排除 React 内部的其他 appendChild 调用）
+      const appendCalls = vi.mocked(document.body.appendChild).mock.calls;
+      const anchorCall = appendCalls.find(([el]) => el.tagName === 'A');
+      expect(anchorCall).toBeDefined();
+      const appendedEl = anchorCall[0];
+      expect(appendedEl.href).toBe('https://example.com/checkin');
+      expect(appendedEl.target).toBe('_blank');
+      expect(appendedEl.rel).toBe('noopener noreferrer');
+      expect(appendedEl.click).toHaveBeenCalled();
     });
 
     it('在当前时间不匹配课程时不触发跳转', () => {
@@ -175,7 +195,8 @@ describe('useCheckinScheduler - 签到调度器', () => {
         vi.advanceTimersByTime(0);
       });
 
-      expect(window.location.href).toBe('');
+      // 不应触发跳转，removeChild 不应被调用
+      expect(document.body.removeChild).not.toHaveBeenCalled();
     });
 
     it('课程列表为空时不触发跳转', () => {
@@ -189,7 +210,8 @@ describe('useCheckinScheduler - 签到调度器', () => {
         vi.advanceTimersByTime(0);
       });
 
-      expect(window.location.href).toBe('');
+      // 不应触发跳转，removeChild 不应被调用
+      expect(document.body.removeChild).not.toHaveBeenCalled();
     });
   });
 

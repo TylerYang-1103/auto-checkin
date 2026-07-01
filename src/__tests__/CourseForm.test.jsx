@@ -4,10 +4,10 @@ import userEvent from '@testing-library/user-event';
 import CourseForm from '../components/CourseForm';
 
 /**
- * 辅助函数：在 MUI Dialog 中通过 TextField 的 placeholder 获取输入框
+ * 辅助函数：通过 placeholder 获取输入框
  */
 function getNameInput() {
-  return screen.getByPlaceholderText('例如：高等数学');
+  return screen.getByPlaceholderText('e.g. MATH_101');
 }
 
 function getUrlInput() {
@@ -36,10 +36,10 @@ describe('CourseForm 组件', () => {
       expect(nameInput).toHaveValue('');
 
       // 点击添加按钮触发验证
-      const addButton = screen.getByText('添加');
+      const addButton = screen.getByText('$ add');
       await user.click(addButton);
 
-      expect(screen.getByText('请输入课程名称')).toBeInTheDocument();
+      expect(screen.getByText('ERROR: 请输入课程名称')).toBeInTheDocument();
     });
 
     it('签到链接为空时显示错误 "请输入签到链接"', async () => {
@@ -51,10 +51,10 @@ describe('CourseForm 组件', () => {
       await user.type(nameInput, '高等数学');
 
       // 保持链接为空，点击添加
-      const addButton = screen.getByText('添加');
+      const addButton = screen.getByText('$ add');
       await user.click(addButton);
 
-      expect(screen.getByText('请输入签到链接')).toBeInTheDocument();
+      expect(screen.getByText('ERROR: 请输入签到链接')).toBeInTheDocument();
     });
 
     it('签到链接为无效 URL 时显示错误', async () => {
@@ -67,11 +67,11 @@ describe('CourseForm 组件', () => {
       const urlInput = getUrlInput();
       await user.type(urlInput, 'not-a-valid-url');
 
-      const addButton = screen.getByText('添加');
+      const addButton = screen.getByText('$ add');
       await user.click(addButton);
 
       expect(
-        screen.getByText(/请输入有效的 URL/)
+        screen.getByText(/ERROR: 请输入有效的 URL/)
       ).toBeInTheDocument();
     });
 
@@ -87,7 +87,7 @@ describe('CourseForm 组件', () => {
       const urlInput = getUrlInput();
       await user.type(urlInput, 'https://example.com/checkin');
 
-      const addButton = screen.getByText('添加');
+      const addButton = screen.getByText('$ add');
       await user.click(addButton);
 
       expect(handleSave).toHaveBeenCalledTimes(1);
@@ -101,7 +101,7 @@ describe('CourseForm 组件', () => {
   });
 
   describe('编辑模式', () => {
-    it('编辑模式下标题显示"编辑课程"', () => {
+    it('编辑模式下显示课程编辑标题', () => {
       const course = {
         id: '1',
         name: '高等数学',
@@ -112,10 +112,10 @@ describe('CourseForm 组件', () => {
 
       render(<CourseForm {...defaultProps} course={course} />);
 
-      expect(screen.getByText('编辑课程')).toBeInTheDocument();
+      expect(screen.getByText('$ EDIT_COURSE // 高等数学')).toBeInTheDocument();
     });
 
-    it('编辑模式下按钮显示"保存"', () => {
+    it('编辑模式下按钮显示"$ update"', () => {
       const course = {
         id: '1',
         name: '高等数学',
@@ -126,7 +126,7 @@ describe('CourseForm 组件', () => {
 
       render(<CourseForm {...defaultProps} course={course} />);
 
-      expect(screen.getByText('保存')).toBeInTheDocument();
+      expect(screen.getByText('$ update')).toBeInTheDocument();
     });
 
     it('编辑模式下预填课程数据', () => {
@@ -155,7 +155,7 @@ describe('CourseForm 组件', () => {
 
       render(<CourseForm {...defaultProps} onClose={handleClose} />);
 
-      const cancelButton = screen.getByText('取消');
+      const cancelButton = screen.getByText('$ cancel');
       await user.click(cancelButton);
 
       expect(handleClose).toHaveBeenCalledTimes(1);

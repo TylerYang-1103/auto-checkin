@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-  Alert,
-} from '@mui/material';
+
 /**
  * 课程表单对话框组件
  * 用于添加新课程或编辑已有课程
@@ -108,7 +95,7 @@ export default function CourseForm({ open, course, onSave, onClose }) {
   };
 
   /**
-   * 生成每天的小时选项
+   * 生成每天的时间选项
    */
   const generateTimeOptions = () => {
     const options = [];
@@ -123,111 +110,136 @@ export default function CourseForm({ open, course, onSave, onClose }) {
 
   const dayLabels = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
-  return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-      TransitionProps={{
-        onExited: () => setErrors({}),
-      }}
-    >
-      <DialogTitle sx={{ fontWeight: 600 }}>
-        {isEdit ? '编辑课程' : '添加课程'}
-      </DialogTitle>
+  if (!open) return null;
 
-      <DialogContent dividers>
-        <Box className="space-y-4 pt-2">
-          {/* 课程名称 */}
-          <TextField
-            label="课程名称"
-            placeholder="例如：高等数学"
-            fullWidth
-            required
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center
+        bg-[rgba(0,0,0,0.7)] backdrop-blur-sm"
+      onClick={handleClose}
+    >
+      <div
+        className="glass-card p-6 w-full max-w-sm mx-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-sm font-mono text-[#00ff41] mb-4">
+          {isEdit ? `$ EDIT_COURSE // ${course.name}` : '$ ADD_COURSE'}
+        </div>
+
+        {/* 课程名输入 */}
+        <div className="mb-3">
+          <label className="text-[10px] font-mono text-[#666] tracking-wider mb-1 block">
+            COURSE_NAME
+          </label>
+          <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            error={!!errors.name}
-            helperText={errors.name}
-            autoFocus
-            variant="outlined"
-            size="medium"
+            placeholder="e.g. MATH_101"
+            className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(0,255,65,0.2)]
+              rounded px-3 py-2 text-sm font-mono text-[#c0c0c0]
+              focus:outline-none focus:border-[#00ff41] focus:shadow-[0_0_8px_rgba(0,255,65,0.15)]
+              placeholder:text-[#444] transition-all"
           />
+          {errors.name && (
+            <div className="text-[10px] font-mono text-[#ff4444] mt-1">
+              ERROR: {errors.name}
+            </div>
+          )}
+        </div>
 
-          {/* 签到链接 */}
-          <TextField
-            label="签到链接"
-            placeholder="https://example.com/checkin"
-            fullWidth
-            required
+        {/* 签到链接输入 */}
+        <div className="mb-3">
+          <label className="text-[10px] font-mono text-[#666] tracking-wider mb-1 block">
+            CHECKIN_URL
+          </label>
+          <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            error={!!errors.url}
-            helperText={errors.url}
-            variant="outlined"
-            size="medium"
-            type="url"
+            placeholder="https://example.com/checkin"
+            className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(0,255,65,0.2)]
+              rounded px-3 py-2 text-sm font-mono text-[#c0c0c0]
+              focus:outline-none focus:border-[#00ff41] focus:shadow-[0_0_8px_rgba(0,255,65,0.15)]
+              placeholder:text-[#444] transition-all"
           />
+          {errors.url && (
+            <div className="text-[10px] font-mono text-[#ff4444] mt-1">
+              ERROR: {errors.url}
+            </div>
+          )}
+        </div>
 
-          {/* 星期选择 */}
-          <FormControl fullWidth required error={!!errors.dayOfWeek} size="medium">
-            <InputLabel id="day-of-week-label">星期</InputLabel>
-            <Select
-              labelId="day-of-week-label"
-              value={dayOfWeek}
-              label="星期"
-              onChange={(e) => setDayOfWeek(e.target.value)}
-            >
-              {dayLabels.map((label, index) => (
-                <MenuItem key={index} value={index}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.dayOfWeek && (
-              <Alert severity="error" sx={{ mt: 1, py: 0 }}>
-                {errors.dayOfWeek}
-              </Alert>
-            )}
-          </FormControl>
+        {/* 星期选择 */}
+        <div className="mb-3">
+          <label className="text-[10px] font-mono text-[#666] tracking-wider mb-1 block">
+            DAY_OF_WEEK
+          </label>
+          <select
+            value={dayOfWeek}
+            onChange={(e) => setDayOfWeek(Number(e.target.value))}
+            className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(0,255,65,0.2)]
+              rounded px-3 py-2 text-sm font-mono text-[#c0c0c0]
+              focus:outline-none focus:border-[#00ff41] focus:shadow-[0_0_8px_rgba(0,255,65,0.15)]
+              transition-all appearance-none"
+          >
+            {dayLabels.map((label, index) => (
+              <option key={index} value={index} className="bg-[#0a0a0a] text-[#c0c0c0]">
+                {label}
+              </option>
+            ))}
+          </select>
+          {errors.dayOfWeek && (
+            <div className="text-[10px] font-mono text-[#ff4444] mt-1">
+              ERROR: {errors.dayOfWeek}
+            </div>
+          )}
+        </div>
 
-          {/* 时间选择 */}
-          <FormControl fullWidth required error={!!errors.time} size="medium">
-            <InputLabel id="time-label">上课时间</InputLabel>
-            <Select
-              labelId="time-label"
-              value={time}
-              label="上课时间"
-              onChange={(e) => setTime(e.target.value)}
-            >
-              {generateTimeOptions().map((t) => (
-                <MenuItem key={t} value={t}>
-                  {t}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.time && (
-              <Alert severity="error" sx={{ mt: 1, py: 0 }}>
-                {errors.time}
-              </Alert>
-            )}
-          </FormControl>
-        </Box>
-      </DialogContent>
+        {/* 时间选择 */}
+        <div className="mb-3">
+          <label className="text-[10px] font-mono text-[#666] tracking-wider mb-1 block">
+            TIME
+          </label>
+          <select
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(0,255,65,0.2)]
+              rounded px-3 py-2 text-sm font-mono text-[#c0c0c0]
+              focus:outline-none focus:border-[#00ff41] focus:shadow-[0_0_8px_rgba(0,255,65,0.15)]
+              transition-all appearance-none"
+          >
+            {generateTimeOptions().map((t) => (
+              <option key={t} value={t} className="bg-[#0a0a0a] text-[#c0c0c0]">
+                {t}
+              </option>
+            ))}
+          </select>
+          {errors.time && (
+            <div className="text-[10px] font-mono text-[#ff4444] mt-1">
+              ERROR: {errors.time}
+            </div>
+          )}
+        </div>
 
-      <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={handleClose} color="inherit">
-          取消
-        </Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          color="primary"
-          sx={{ minWidth: 80 }}
-        >
-          {isEdit ? '保存' : '添加'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        {/* 按钮行 */}
+        <div className="flex justify-end gap-3 mt-6 pt-3 border-t border-[rgba(0,255,65,0.08)]">
+          <button
+            onClick={handleClose}
+            className="text-xs font-mono px-4 py-2 rounded text-[#888] hover:text-[#c0c0c0] transition-colors"
+          >
+            $ cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="text-xs font-mono px-4 py-2 rounded
+              bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)]
+              text-[#00ff41] hover:bg-[rgba(0,255,65,0.2)]
+              hover:shadow-[0_0_12px_rgba(0,255,65,0.2)]
+              transition-all"
+          >
+            $ {isEdit ? 'update' : 'add'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

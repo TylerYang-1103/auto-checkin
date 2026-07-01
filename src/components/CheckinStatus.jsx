@@ -1,16 +1,4 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Button,
-  Alert,
-  Paper,
-} from '@mui/material';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { DAY_NAMES } from '../hooks/useCheckinScheduler';
 
 /**
@@ -23,6 +11,7 @@ import { DAY_NAMES } from '../hooks/useCheckinScheduler';
  * @param {boolean} props.isChecking - 是否正在检查
  * @param {Function} props.onRequestLocation - 请求位置权限回调
  * @param {boolean} props.locationGranted - 位置权限是否已授予
+ * @param {Object|null} props.position - 位置坐标 { lat, lng }
  */
 export default function CheckinStatus({
   nextCourse,
@@ -30,116 +19,69 @@ export default function CheckinStatus({
   isChecking,
   onRequestLocation,
   locationGranted,
+  position,
 }) {
   return (
-    <Paper
-      elevation={0}
-      variant="outlined"
-      className="w-full"
-      sx={{
-        borderRadius: 2,
-        p: 2,
-        mb: 2,
-      }}
-    >
-      {/* 状态行：运行状态 + 位置权限 */}
-      <Box className="flex flex-wrap items-center justify-between gap-2 mb-2">
-        {/* 运行状态 */}
-        <Box className="flex items-center gap-2">
-          <Chip
-            icon={
-              <CheckCircleOutlineIcon
-                sx={{ fontSize: 18, color: isChecking ? '#2e7d32' : '#9e9e9e' }}
-              />
-            }
-            label={isChecking ? '运行中' : '已停止'}
-            color={isChecking ? 'success' : 'default'}
-            size="small"
-            variant="filled"
+    <div className="glass-card p-4 mb-4">
+      {/* 状态行 */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span
+            className={`w-2 h-2 rounded-full ${
+              isChecking
+                ? 'bg-[#00ff41] shadow-[0_0_6px_rgba(0,255,65,0.8)]'
+                : 'bg-[#666]'
+            }`}
           />
-          <Typography variant="caption" color="text.secondary">
-            每秒检查课程时间
-          </Typography>
-        </Box>
+          <span className="text-xs font-mono text-[#888]">
+            {isChecking ? 'STATUS: ACTIVE' : 'STATUS: STOPPED'}
+          </span>
+          <span className="text-[10px] font-mono text-[#555]">
+            /* {isChecking ? 'checking every 1s' : 'idle'} */
+          </span>
+        </div>
 
-        {/* 位置权限按钮 */}
-        <Button
-          variant={locationGranted ? 'text' : 'outlined'}
-          size="small"
-          color={locationGranted ? 'success' : 'primary'}
-          startIcon={<LocationOnIcon />}
+        <button
           onClick={onRequestLocation}
-          sx={{ textTransform: 'none', minWidth: 0 }}
+          className={`text-xs font-mono px-3 py-1 rounded border transition-all
+            ${
+              locationGranted
+                ? 'border-[rgba(0,255,65,0.3)] text-[#00ff41] bg-[rgba(0,255,65,0.05)]'
+                : 'border-[rgba(0,212,255,0.3)] text-[#00d4ff] hover:bg-[rgba(0,212,255,0.05)]'
+            }`}
         >
-          {locationGranted ? '位置已授权' : '请求位置权限'}
-        </Button>
-      </Box>
+          {locationGranted ? 'GPS: LOCKED' : 'REQUEST GPS_'}
+        </button>
+      </div>
 
-      {/* 下一个课程倒计时 */}
-      <Box
-        className="flex items-center gap-3 mt-1"
-        sx={{
-          backgroundColor: nextCourse ? 'rgba(25,118,210,0.06)' : 'transparent',
-          borderRadius: 1.5,
-          p: nextCourse ? 1.5 : 0,
-        }}
-      >
-        <AccessTimeIcon
-          sx={{
-            fontSize: 28,
-            color: nextCourse ? 'primary.main' : 'text.disabled',
-          }}
-        />
-
-        {nextCourse ? (
-          <Box className="flex-1 min-w-0">
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              className="truncate"
-              sx={{ lineHeight: 1.2 }}
-            >
-              下一个签到：
-              <Typography
-                component="span"
-                variant="body2"
-                fontWeight={600}
-                color="text.primary"
-              >
-                {nextCourse.course.name}
-              </Typography>
-              <Typography
-                component="span"
-                variant="body2"
-                color="text.secondary"
-              >
-                {' · '}
-                {DAY_NAMES[nextCourse.course.dayOfWeek]} {nextCourse.course.time}
-              </Typography>
-            </Typography>
-            <Typography
-              variant="h6"
-              fontWeight={700}
-              color="primary"
-              sx={{ mt: 0.5, fontVariantNumeric: 'tabular-nums' }}
-            >
-              <NotificationsActiveIcon
-                sx={{ fontSize: 18, verticalAlign: 'middle', mr: 0.5 }}
-              />
-              剩余 {countdown}
-            </Typography>
-          </Box>
-        ) : (
-          <Box className="flex-1 min-w-0">
-            <Typography variant="body2" color="text.secondary">
-              当前暂无待签到课程
-            </Typography>
-            <Typography variant="caption" color="text.disabled">
-              添加课程后将自动显示下一个签到倒计时
-            </Typography>
-          </Box>
-        )}
-      </Box>
-    </Paper>
+      {/* 下一个课程 */}
+      {nextCourse ? (
+        <div className="border-t border-[rgba(0,255,65,0.08)] pt-3">
+          <div className="text-[10px] font-mono text-[#555] uppercase tracking-widest mb-1">
+            Next Check-in_
+          </div>
+          <div className="text-sm font-mono text-[#c0c0c0] truncate">
+            {nextCourse.course.name}
+            <span className="text-[#666]">
+              {' '}
+              // {DAY_NAMES[nextCourse.course.dayOfWeek]}{' '}
+              {nextCourse.course.time}
+            </span>
+          </div>
+          <div className="mt-2 text-2xl font-mono font-bold text-[#00ff41] neon-text tracking-wider">
+            {'>'} {countdown}
+          </div>
+        </div>
+      ) : (
+        <div className="border-t border-[rgba(0,255,65,0.08)] pt-3">
+          <div className="text-xs font-mono text-[#555]">
+            $ no upcoming courses scheduled
+          </div>
+          <div className="text-[10px] font-mono text-[#444] mt-1">
+            /* add a course to begin */
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

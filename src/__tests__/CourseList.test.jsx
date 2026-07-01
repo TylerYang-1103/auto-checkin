@@ -2,43 +2,26 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CourseList from '../components/CourseList';
 
-// Mock MUI icons used by CourseList
-vi.mock('@mui/icons-material/Schedule', () => ({
-  default: () => <span data-testid="icon-schedule">📅</span>,
-}));
-vi.mock('@mui/icons-material/Edit', () => ({
-  default: () => <span data-testid="icon-edit">✏️</span>,
-}));
-vi.mock('@mui/icons-material/Delete', () => ({
-  default: () => <span data-testid="icon-delete">🗑️</span>,
-}));
-vi.mock('@mui/icons-material/OpenInNew', () => ({
-  default: () => <span data-testid="icon-open">🔗</span>,
-}));
-vi.mock('@mui/icons-material/Link', () => ({
-  default: () => <span data-testid="icon-link">🔗</span>,
-}));
-
 describe('CourseList 组件', () => {
   it('courses 为空数组时显示空状态', () => {
     render(<CourseList courses={[]} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    expect(screen.getByText('暂无课程')).toBeInTheDocument();
+    expect(screen.getByText('$ no courses found')).toBeInTheDocument();
     expect(
-      screen.getByText(/点击右下角的 "\+" 按钮添加课程/)
+      screen.getByText(/click the \+ button to add one/)
     ).toBeInTheDocument();
   });
 
   it('courses 为 null 时显示空状态', () => {
     render(<CourseList courses={null} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    expect(screen.getByText('暂无课程')).toBeInTheDocument();
+    expect(screen.getByText('$ no courses found')).toBeInTheDocument();
   });
 
   it('courses 为 undefined 时显示空状态', () => {
     render(<CourseList onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    expect(screen.getByText('暂无课程')).toBeInTheDocument();
+    expect(screen.getByText('$ no courses found')).toBeInTheDocument();
   });
 
   it('有课程时显示课程卡片', () => {

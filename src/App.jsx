@@ -1,26 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  Container,
-  AppBar,
-  Toolbar,
-  Typography,
-  Fab,
-  Snackbar,
-  Alert,
-  Box,
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import AddIcon from '@mui/icons-material/Add';
 
 import CourseList from './components/CourseList';
 import CourseForm from './components/CourseForm';
 import CheckinStatus from './components/CheckinStatus';
 import { useCheckinScheduler } from './hooks/useCheckinScheduler';
+import { useReverseGeocode } from './hooks/useReverseGeocode';
 import {
   getCourses,
   addCourse,
@@ -28,32 +12,6 @@ import {
   deleteCourse,
   clearAllCourses,
 } from './utils/storage';
-
-// 创建 MUI 主题
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-  typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-  },
-  shape: {
-    borderRadius: 8,
-  },
-});
 
 /**
  * 应用根组件
@@ -67,13 +25,16 @@ export default function App() {
   const [editingCourse, setEditingCourse] = useState(null);
   // 位置权限状态
   const [locationGranted, setLocationGranted] = useState(false);
+  // 位置坐标
+  const [position, setPosition] = useState(null);
   // 提示消息状态
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  // 确认清空对话框状态
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
   // 签到调度器
   const { nextCourse, countdown, isChecking, refresh } = useCheckinScheduler();
+
+  // 反地理编码
+  const { locationInfo, loading: locationLoading, fetchLocationInfo } = useReverseGeocode();
 
   // 初始化：加载课程数据
   useEffect(() => {
@@ -84,15 +45,18 @@ export default function App() {
   /**
    * 显示提示消息
    */
-  const showMessage = useCallback((message, severity = 'success') => {
-    setSnackbar({ open: true, message, severity });
+  const showMessage = useCallback((message) => {
+    setSnackbar({ open: true, message });
+    setTimeout(() => {
+      setSnackbar({ open: false, message: '' });
+    }, 3000);
   }, []);
 
   /**
    * 关闭提示消息
    */
   const handleCloseSnackbar = useCallback(() => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
+    setSnackbar({ open: false, message: '' });
   }, []);
 
   /**
@@ -100,17 +64,19 @@ export default function App() {
    */
   const handleRequestLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      showMessage('您的浏览器不支持地理位置功能', 'warning');
+      showMessage('您的浏览器不支持地理位置功能');
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
         setLocationGranted(true);
-        showMessage(
-          `位置权限已获取（纬度: ${position.coords.latitude.toFixed(4)}, 经度: ${position.coords.longitude.toFixed(4)}）`,
-          'success'
-        );
+        setPosition({ lat, lng });
+        showMessage(`位置权限已获取（纬度: ${lat.toFixed(4)}, 经度: ${lng.toFixed(4)}）`);
+        // 触发反地理编码
+        fetchLocationInfo(lat, lng);
       },
       (error) => {
         let message = '获取位置失败';
@@ -129,7 +95,7 @@ export default function App() {
             break;
         }
         setLocationGranted(false);
-        showMessage(message, 'warning');
+        showMessage(message);
       },
       {
         enableHighAccuracy: false,
@@ -137,7 +103,7 @@ export default function App() {
         maximumAge: 300000,
       }
     );
-  }, [showMessage]);
+  }, [showMessage, fetchLocationInfo]);
 
   /**
    * 打开添加课程对话框
@@ -173,11 +139,11 @@ export default function App() {
       if (editingCourse) {
         // 编辑模式
         updatedCourses = updateCourse(editingCourse.id, courseData);
-        showMessage(`课程「${courseData.name}」已更新`, 'success');
+        showMessage(`课程「${courseData.name}」已更新`);
       } else {
         // 添加模式
         updatedCourses = addCourse(courseData);
-        showMessage(`课程「${courseData.name}」已添加`, 'success');
+        showMessage(`课程「${courseData.name}」已添加`);
       }
 
       setCourses(updatedCourses);
@@ -199,7 +165,7 @@ export default function App() {
       const courseName = course ? course.name : '未知课程';
       const updatedCourses = deleteCourse(id);
       setCourses(updatedCourses);
-      showMessage(`课程「${courseName}」已删除`, 'info');
+      showMessage(`课程「${courseName}」已删除`);
 
       // 刷新调度器
       setTimeout(refresh, 0);
@@ -213,113 +179,117 @@ export default function App() {
   const handleClearAll = useCallback(() => {
     clearAllCourses();
     setCourses([]);
-    showMessage('所有课程已清空', 'info');
+    showMessage('所有课程已清空');
     setTimeout(refresh, 0);
   }, [showMessage, refresh]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <>
+      {/* Matrix 背景 */}
+      <div className="matrix-bg" />
 
-      {/* 顶部导航栏 */}
-      <AppBar
-        position="sticky"
-        elevation={1}
-        sx={{ backgroundColor: 'white', color: 'text.primary' }}
-      >
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="h1"
-            className="flex-1 font-bold"
-            sx={{ fontWeight: 700 }}
-          >
-            自动签到系统
-          </Typography>
+      {/* Main Container */}
+      <div className="min-h-screen relative z-10">
 
-          {/* 清空所有课程按钮 */}
-          <Tooltip title="清空所有课程">
-            <IconButton
-              color="error"
+        {/* Header — Linear 风格 */}
+        <header className="border-b border-[rgba(0,255,65,0.1)] bg-[rgba(10,10,10,0.8)] backdrop-blur-md sticky top-0 z-50">
+          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+            <h1 className="text-[#00ff41] text-lg font-semibold tracking-wider neon-text">
+              {`> AUTO_CHECKIN`}
+              <span className="animate-pulse ml-1">_</span>
+            </h1>
+            <button
               onClick={handleClearAll}
               disabled={courses.length === 0}
-              size="small"
+              className="text-[#666] hover:text-[#ff4444] transition-colors text-sm font-mono disabled:opacity-30"
             >
-              <DeleteSweepIcon />
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
-      </AppBar>
+              ~ $ clear
+            </button>
+          </div>
+        </header>
 
-      {/* 主内容区域 */}
-      <Container maxWidth="sm" sx={{ py: 2, pb: 10 }}>
-        {/* 签到状态 */}
-        <CheckinStatus
-          nextCourse={nextCourse}
-          countdown={countdown}
-          isChecking={isChecking}
-          onRequestLocation={handleRequestLocation}
-          locationGranted={locationGranted}
-        />
+        {/* Content */}
+        <div className="max-w-lg mx-auto px-4 py-4 pb-24">
+          {/* CheckinStatus */}
+          <CheckinStatus
+            nextCourse={nextCourse}
+            countdown={countdown}
+            isChecking={isChecking}
+            onRequestLocation={handleRequestLocation}
+            locationGranted={locationGranted}
+            position={position}
+          />
 
-        {/* 课程列表 */}
-        <CourseList
-          courses={courses}
-          onEdit={handleOpenEdit}
-          onDelete={handleDeleteCourse}
-        />
-      </Container>
+          {/* CourseList */}
+          <CourseList
+            courses={courses}
+            onEdit={handleOpenEdit}
+            onDelete={handleDeleteCourse}
+          />
+        </div>
 
-      {/* 添加课程浮动按钮 */}
-      {!formOpen && (
-        <Box
-          className="fixed"
-          sx={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 1000,
-          }}
+        {/* 底部定位信息 — 经度 + 纬度（城市·区） */}
+        {locationGranted && position && (
+          <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-[rgba(10,10,10,0.9)] border-t border-[rgba(0,255,65,0.1)] backdrop-blur-md">
+            <div className="max-w-lg mx-auto flex items-center justify-center gap-2 font-mono text-xs text-[#888]">
+              <span className="text-[#00ff41]">◆</span>
+              <span>纬度: {position.lat.toFixed(6)}</span>
+              <span className="text-[#666]">|</span>
+              <span>经度: {position.lng.toFixed(6)}</span>
+              {locationInfo ? (
+                <>
+                  <span className="text-[#666]">|</span>
+                  <span className="text-[#00d4ff]">
+                    ({locationInfo.city}{locationInfo.district ? ` · ${locationInfo.district}` : ''})
+                  </span>
+                </>
+              ) : locationLoading ? (
+                <>
+                  <span className="text-[#666]">|</span>
+                  <span className="text-[#666] animate-pulse">解析位置中...</span>
+                </>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {/* FAB 添加按钮 */}
+        <button
+          onClick={handleOpenAdd}
+          className="fixed bottom-20 right-6 z-50 w-14 h-14 rounded-full
+            bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)]
+            text-[#00ff41] text-2xl font-mono
+            hover:bg-[rgba(0,255,65,0.2)] hover:border-[#00ff41]
+            hover:shadow-[0_0_20px_rgba(0,255,65,0.3)]
+            transition-all duration-300
+            flex items-center justify-center
+            backdrop-blur-md"
         >
-          <Fab
-            color="primary"
-            aria-label="添加课程"
-            onClick={handleOpenAdd}
-            sx={{
-              width: 56,
-              height: 56,
-              boxShadow: '0 4px 16px rgba(25,118,210,0.3)',
-            }}
+          +
+        </button>
+
+        {/* CourseForm Dialog */}
+        <CourseForm
+          open={formOpen}
+          course={editingCourse}
+          onSave={handleSaveCourse}
+          onClose={handleCloseForm}
+        />
+
+        {/* Snackbar 换成自定义轻提示 */}
+        {snackbar.open && (
+          <div
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50
+              px-4 py-2 rounded-lg font-mono text-sm
+              bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)]
+              text-[#00ff41] backdrop-blur-md
+              animate-fadeIn cursor-pointer"
+            onClick={handleCloseSnackbar}
           >
-            <AddIcon />
-          </Fab>
-        </Box>
-      )}
-
-      {/* 课程表单对话框 */}
-      <CourseForm
-        open={formOpen}
-        course={editingCourse}
-        onSave={handleSaveCourse}
-        onClose={handleCloseForm}
-      />
-
-      {/* 提示消息 */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </ThemeProvider>
+            $ {snackbar.message}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -16,7 +16,7 @@
 
 ## 在线使用
 
-👉 **[https://tyleryang-1103.github.io/auto-checkin/](https://tyleryang-1103.github.io/auto-checkin/)**
+👉 **[[https://tyleryang-1103.github.io/auto-checkin/](https://tyleryang-1103.github.io/auto-checkin/](https://auto-checkin-six.vercel.app/)]([https://tyleryang-1103.github.io/auto-checkin/](https://auto-checkin-six.vercel.app/))**
 
 打开即用，无需登录，无需后端。
 

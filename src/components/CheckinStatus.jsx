@@ -22,68 +22,73 @@ export default function CheckinStatus({
   position,
 }) {
   return (
-    <div className="panel-white p-4 mb-4">
+    <div className="glass-panel p-5 mb-5 animate-slide-up">
       {/* 状态行 */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span
-            className={`status-dot ${isChecking ? 'status-dot-active' : 'status-dot-inactive'}`}
-          />
-          <span className="text-xs" style={{ color: 'rgba(0,0,0,0.62)', fontWeight: 400 }}>
-            {isChecking ? 'STATUS: ACTIVE' : 'STATUS: STOPPED'}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <span className={`status-indicator ${isChecking ? 'status-active' : 'status-inactive'}`} />
+          <span className="text-xs font-medium tracking-wide" style={{ color: 'var(--text-secondary)' }}>
+            {isChecking ? '监控运行中' : '监控已暂停'}
           </span>
         </div>
 
         <button
           onClick={onRequestLocation}
-          className="pill px-3 py-1.5 text-xs font-medium transition-all duration-200"
+          className={`glass-button px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${
+            locationGranted ? 'text-blue-600' : ''
+          }`}
           style={{
-            color: locationGranted ? '#4b6bff' : '#4b6bff',
-            backgroundColor: locationGranted ? 'rgba(75,107,255,0.06)' : 'transparent',
-            border: `1px solid ${locationGranted ? '#4b6bff' : 'rgba(75,107,255,0.4)'}`,
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'rgba(75,107,255,0.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = locationGranted ? 'rgba(75,107,255,0.06)' : 'transparent';
+            color: locationGranted ? '#4b6bff' : 'var(--text-secondary)',
+            background: locationGranted
+              ? 'linear-gradient(135deg, rgba(75, 107, 255, 0.08), rgba(124, 58, 237, 0.05))'
+              : '',
+            borderColor: locationGranted ? 'rgba(75, 107, 255, 0.2)' : '',
           }}
         >
-          {locationGranted ? 'GPS: LOCKED' : 'REQUEST GPS_'}
+          {locationGranted ? '已定位' : '获取位置'}
         </button>
       </div>
 
+      {/* 分隔线 */}
+      <div className="divider-gradient" />
+
       {/* 下一个课程 */}
       {nextCourse ? (
-        <div style={{ borderTop: '1px solid rgba(15,23,42,0.06)' }} className="pt-3">
-          <div
-            className="text-xs mb-1.5"
-            style={{ color: 'rgba(0,0,0,0.48)', fontWeight: 540, letterSpacing: '0.03em' }}
-          >
-            Next Check-in_
+        <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="text-xs font-medium tracking-wider mb-1.5" style={{ color: 'var(--text-tertiary)' }}>
+            下次签到
           </div>
-          <div className="text-sm truncate" style={{ color: 'rgba(0,0,0,0.7)', fontWeight: 500 }}>
-            {nextCourse.course.name}
-            <span style={{ color: 'rgba(0,0,0,0.48)' }}>
-              {' '}
-              {DAY_NAMES[nextCourse.course.dayOfWeek]}{' '}
-              {nextCourse.course.time}
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+              {nextCourse.course.name}
+            </span>
+            <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+              {DAY_NAMES[nextCourse.course.dayOfWeek]} {nextCourse.course.time}
             </span>
           </div>
           <div
-            className="mt-2 tracking-tight section-title-weight"
-            style={{ fontSize: 22, fontWeight: 620, color: '#111318', letterSpacing: '-0.02em' }}
+            className="font-mono font-semibold tracking-tight mt-2"
+            style={{
+              fontSize: 28,
+              background: 'linear-gradient(135deg, #4b6bff 0%, #7c3aed 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
           >
-            {'>'} {countdown}
+            {countdown}
           </div>
         </div>
       ) : (
-        <div style={{ borderTop: '1px solid rgba(15,23,42,0.06)' }} className="pt-3">
-          <div className="text-xs" style={{ color: 'rgba(0,0,0,0.62)' }}>
-            $ no upcoming courses scheduled
+        <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="text-xs font-medium tracking-wider mb-1" style={{ color: 'var(--text-tertiary)' }}>
+            下次签到
           </div>
-          <div className="text-xs mt-1" style={{ color: 'rgba(0,0,0,0.38)' }}>
-            /* add a course to begin */
+          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            暂无待签课程
+          </div>
+          <div className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
+            点击右下角 + 按钮添加课程
           </div>
         </div>
       )}

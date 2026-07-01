@@ -2,22 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import CheckinStatus from '../components/CheckinStatus';
 
-// Mock MUI icons
-vi.mock('@mui/icons-material/NotificationsActive', () => ({
-  default: () => <span data-testid="icon-notifications">🔔</span>,
-}));
-vi.mock('@mui/icons-material/LocationOn', () => ({
-  default: () => <span data-testid="icon-location">📍</span>,
-}));
-vi.mock('@mui/icons-material/AccessTime', () => ({
-  default: () => <span data-testid="icon-time">⏰</span>,
-}));
-vi.mock('@mui/icons-material/CheckCircleOutline', () => ({
-  default: () => <span data-testid="icon-check">✅</span>,
-}));
-
 describe('CheckinStatus 组件', () => {
-  it('无课程时显示"当前暂无待签到课程"', () => {
+  it('无课程时显示"$ no upcoming courses scheduled"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -28,9 +14,9 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('当前暂无待签到课程')).toBeInTheDocument();
+    expect(screen.getByText('$ no upcoming courses scheduled')).toBeInTheDocument();
     expect(
-      screen.getByText('添加课程后将自动显示下一个签到倒计时')
+      screen.getByText('/* add a course to begin */')
     ).toBeInTheDocument();
   });
 
@@ -63,7 +49,7 @@ describe('CheckinStatus 组件', () => {
     expect(screen.getByText(/08:00/)).toBeInTheDocument();
   });
 
-  it('isChecking 为 true 时显示"运行中"标签', () => {
+  it('isChecking 为 true 时显示"STATUS: ACTIVE"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -74,10 +60,10 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('运行中')).toBeInTheDocument();
+    expect(screen.getByText('STATUS: ACTIVE')).toBeInTheDocument();
   });
 
-  it('isChecking 为 false 时显示"已停止"标签', () => {
+  it('isChecking 为 false 时显示"STATUS: STOPPED"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -88,10 +74,10 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('已停止')).toBeInTheDocument();
+    expect(screen.getByText('STATUS: STOPPED')).toBeInTheDocument();
   });
 
-  it('位置权限已授权时显示"位置已授权"', () => {
+  it('位置权限已授权时显示"GPS: LOCKED"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -102,10 +88,10 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('位置已授权')).toBeInTheDocument();
+    expect(screen.getByText('GPS: LOCKED')).toBeInTheDocument();
   });
 
-  it('位置权限未授权时显示"请求位置权限"', () => {
+  it('位置权限未授权时显示"REQUEST GPS_"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -116,6 +102,6 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('请求位置权限')).toBeInTheDocument();
+    expect(screen.getByText('REQUEST GPS_')).toBeInTheDocument();
   });
 });

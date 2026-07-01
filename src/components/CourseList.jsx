@@ -14,9 +14,9 @@ export default function CourseList({ courses, onEdit, onDelete }) {
   if (!courses || courses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <div className="text-[#444] text-4xl font-mono mb-4">{'> _'}</div>
-        <div className="text-sm font-mono text-[#666]">$ no courses found</div>
-        <div className="text-xs font-mono text-[#555] mt-2">
+        <div className="text-4xl mb-4" style={{ color: 'rgba(0,0,0,0.15)', fontFamily: "'SF Mono', 'JetBrains Mono', ui-monospace, monospace", fontWeight: 300 }}>{'> _'}</div>
+        <div className="text-sm" style={{ color: 'rgba(0,0,0,0.62)' }}>$ no courses found</div>
+        <div className="text-xs mt-2" style={{ color: 'rgba(0,0,0,0.38)' }}>
           /* click the + button to add one */
         </div>
       </div>
@@ -47,30 +47,30 @@ export default function CourseList({ courses, onEdit, onDelete }) {
  */
 function CourseCard({ course, onEdit, onDelete }) {
   return (
-    <div className="glass-card p-4 mb-3 relative overflow-hidden group">
-      {/* 左侧绿色装饰线 */}
-      <div className="absolute left-0 top-2 bottom-2 w-[2px] bg-[#00ff41] opacity-50 group-hover:opacity-100 transition-opacity shadow-[0_0_8px_rgba(0,255,65,0.3)]" />
-
-      <div className="flex items-start justify-between pl-3">
+    <div className="course-card p-4 relative group">
+      <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           {/* 课程名 */}
-          <div className="text-sm font-mono text-[#e0e0e0] truncate">
-            <span className="text-[#00ff41]">{'>'}</span> {course.name}
+          <div className="truncate card-title-weight" style={{ fontSize: 16, color: '#1a1a2e' }}>
+            <span style={{ color: 'rgba(0,0,0,0.3)' }}>{'>'}</span> {course.name}
           </div>
 
           {/* 标签行 */}
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-[rgba(0,255,65,0.2)] text-[#00ff41]">
+            <span className="pill-accent pill px-2.5 py-0.5" style={{ fontSize: 11 }}>
               {DAY_NAMES[course.dayOfWeek]}
             </span>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[rgba(0,255,65,0.1)] text-[#00ff41]">
+            <span className="pill-accent pill px-2.5 py-0.5" style={{ fontSize: 11 }}>
               {course.time}
             </span>
             <a
               href={course.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[11px] font-mono text-[#555] truncate max-w-[180px] hover:text-[#00d4ff] transition-colors"
+              className="text-xs truncate max-w-[180px] transition-colors"
+              style={{ color: 'rgba(0,0,0,0.38)' }}
+              onMouseEnter={(e) => { e.target.style.color = '#4b6bff'; }}
+              onMouseLeave={(e) => { e.target.style.color = 'rgba(0,0,0,0.38)'; }}
             >
               {course.url}
             </a>
@@ -82,20 +82,34 @@ function CourseCard({ course, onEdit, onDelete }) {
           <button
             onClick={onEdit}
             aria-label="编辑课程"
-            className="w-7 h-7 rounded flex items-center justify-center
-              text-[#888] hover:text-[#00d4ff] hover:bg-[rgba(0,212,255,0.1)]
-              transition-all text-xs font-mono"
+            className="pill px-2.5 py-1 text-xs transition-all duration-200"
+            style={{ color: 'rgba(0,0,0,0.38)', backgroundColor: 'transparent' }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'rgba(75,107,255,0.06)';
+              e.target.style.color = '#4b6bff';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'rgba(0,0,0,0.38)';
+            }}
           >
-            ✎
+            编辑
           </button>
           <button
             onClick={onDelete}
             aria-label="删除课程"
-            className="w-7 h-7 rounded flex items-center justify-center
-              text-[#888] hover:text-[#ff4444] hover:bg-[rgba(255,68,68,0.1)]
-              transition-all text-xs font-mono"
+            className="pill px-2.5 py-1 text-xs transition-all duration-200"
+            style={{ color: 'rgba(0,0,0,0.38)', backgroundColor: 'transparent' }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'rgba(220,38,38,0.06)';
+              e.target.style.color = '#dc2626';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'rgba(0,0,0,0.38)';
+            }}
           >
-            ✕
+            删除
           </button>
         </div>
       </div>

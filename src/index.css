@@ -2,23 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Matrix 数字雨背景 */
-@keyframes matrixRain {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 0% 100%; }
+/* =============================================
+   awesome-design-md-cn Design Tokens
+   理性、冷静、editorial 风格
+   ============================================= */
+
+:root {
+  --color-page: #f2f5f9;
+  --color-hero: #111318;
+  --color-accent: #4b6bff;
+  --color-panel: rgba(255, 255, 255, 0.82);
+  --color-card: #f7f9fc;
+  --color-card-hover: #fbfcfe;
+  --color-border: rgba(15, 23, 42, 0.08);
+  --color-text-weak: rgba(0, 0, 0, 0.62);
+  --color-text-silent: rgba(0, 0, 0, 0.48);
 }
 
 body {
   margin: 0;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: 'SF Pro Display', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'system-ui', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0a0a0a;
-  color: #c0c0c0;
-  /* 扫描线效果 */
-  background-image: 
-    linear-gradient(0deg, transparent 49%, rgba(0, 255, 65, 0.02) 50%, transparent 51%);
-  background-size: 100% 4px;
+  background-color: var(--color-page);
+  color: #1a1a2e;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -27,69 +34,100 @@ body {
   min-height: 100vh;
 }
 
-/* 自定义滚动条 */
+/* 自定义滚动条 — 冷静风格 */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #00ff41;
+  background: rgba(15, 23, 42, 0.12);
   border-radius: 3px;
 }
-
-/* 霓虹文字发光效果 */
-.neon-text {
-  text-shadow: 0 0 7px rgba(0, 255, 65, 0.3), 0 0 10px rgba(0, 255, 65, 0.2);
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.2);
 }
 
-/* 发光边框 */
-.glow-border {
-  border: 1px solid rgba(0, 255, 65, 0.2);
-  transition: all 0.3s ease;
-}
-.glow-border:hover {
-  border-color: rgba(0, 255, 65, 0.5);
-  box-shadow: 0 0 15px rgba(0, 255, 65, 0.15);
-}
+/* =============================================
+   Utility Classes
+   ============================================= */
 
-/* 玻璃卡片 */
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 255, 65, 0.1);
+/* 面板白色卡片 */
+.panel-white {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  transition: all 0.3s ease;
-}
-.glass-card:hover {
-  border-color: rgba(0, 255, 65, 0.3);
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
-  transform: translateY(-2px);
+  transition: all 0.25s ease;
 }
 
-/* 输入框赛博风格 */
-.cyber-input input,
-.cyber-input textarea,
-.cyber-input .MuiOutlinedInput-root {
-  font-family: 'JetBrains Mono', monospace !important;
+/* 课程卡片 */
+.course-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+.course-card:hover {
+  background: var(--color-card-hover);
 }
 
-/* Matrix 动画背景容器 */
-.matrix-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.04;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 255, 65, 0.05) 2px,
-    rgba(0, 255, 65, 0.05) 4px
-  );
+/* 标签徽章 - pill 形状 */
+.pill {
+  border-radius: 999px;
+}
+
+/* 蓝色强调标签 */
+.pill-accent {
+  border-radius: 999px;
+  background: rgba(75, 107, 255, 0.06);
+  color: var(--color-accent);
+  font-weight: 540;
+}
+
+/* Hero Title 字重 */
+.hero-title-weight {
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+/* Section Title 字重 */
+.section-title-weight {
+  font-weight: 400;
+  line-height: 1.04;
+}
+
+/* Card Title 字重 */
+.card-title-weight {
+  font-weight: 640;
+  line-height: 1.08;
+}
+
+/* Label/Badge 字重 */
+.label-weight {
+  font-weight: 540;
+  line-height: 1;
+}
+
+/* 状态指示点 */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+.status-dot-active {
+  box-shadow: 0 0 6px rgba(75, 107, 255, 0.4);
+}
+.status-dot-inactive {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Snackbar 提示 */
+.snackbar-toast {
+  background: var(--color-panel);
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
 }

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import CheckinStatus from '../components/CheckinStatus';
 
 describe('CheckinStatus 组件', () => {
-  it('无课程时显示"$ no upcoming courses scheduled"', () => {
+  it('无课程时显示"暂无待签课程"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -14,9 +14,9 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('$ no upcoming courses scheduled')).toBeInTheDocument();
+    expect(screen.getByText('暂无待签课程')).toBeInTheDocument();
     expect(
-      screen.getByText('/* add a course to begin */')
+      screen.getByText('点击右下角 + 按钮添加课程')
     ).toBeInTheDocument();
   });
 
@@ -49,7 +49,7 @@ describe('CheckinStatus 组件', () => {
     expect(screen.getByText(/08:00/)).toBeInTheDocument();
   });
 
-  it('isChecking 为 true 时显示"STATUS: ACTIVE"', () => {
+  it('isChecking 为 true 时显示"监控运行中"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -60,10 +60,10 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('STATUS: ACTIVE')).toBeInTheDocument();
+    expect(screen.getByText('监控运行中')).toBeInTheDocument();
   });
 
-  it('isChecking 为 false 时显示"STATUS: STOPPED"', () => {
+  it('isChecking 为 false 时显示"监控已暂停"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -74,10 +74,10 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('STATUS: STOPPED')).toBeInTheDocument();
+    expect(screen.getByText('监控已暂停')).toBeInTheDocument();
   });
 
-  it('位置权限已授权时显示"GPS: LOCKED"', () => {
+  it('位置权限已授权时显示"已定位"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -88,10 +88,10 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('GPS: LOCKED')).toBeInTheDocument();
+    expect(screen.getByText('已定位')).toBeInTheDocument();
   });
 
-  it('位置权限未授权时显示"REQUEST GPS_"', () => {
+  it('位置权限未授权时显示"获取位置"', () => {
     render(
       <CheckinStatus
         nextCourse={null}
@@ -102,6 +102,6 @@ describe('CheckinStatus 组件', () => {
       />
     );
 
-    expect(screen.getByText('REQUEST GPS_')).toBeInTheDocument();
+    expect(screen.getByText('获取位置')).toBeInTheDocument();
   });
 });

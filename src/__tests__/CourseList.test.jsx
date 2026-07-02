@@ -6,25 +6,25 @@ describe('CourseList 组件', () => {
   it('courses 为空数组时显示空状态', () => {
     render(<CourseList courses={[]} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    expect(screen.getByText('$ no courses found')).toBeInTheDocument();
+    expect(screen.getByText('暂无课程安排')).toBeInTheDocument();
     expect(
-      screen.getByText(/click the \+ button to add one/)
+      screen.getByText(/点击右下角 \+ 按钮添加课程/)
     ).toBeInTheDocument();
   });
 
   it('courses 为 null 时显示空状态', () => {
     render(<CourseList courses={null} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    expect(screen.getByText('$ no courses found')).toBeInTheDocument();
+    expect(screen.getByText('暂无课程安排')).toBeInTheDocument();
   });
 
   it('courses 为 undefined 时显示空状态', () => {
     render(<CourseList onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    expect(screen.getByText('$ no courses found')).toBeInTheDocument();
+    expect(screen.getByText('暂无课程安排')).toBeInTheDocument();
   });
 
-  it('有课程时显示课程卡片', () => {
+    it('有课程时显示课程卡片', () => {
     const courses = [
       {
         id: '1',
@@ -44,13 +44,13 @@ describe('CourseList 组件', () => {
 
     render(<CourseList courses={courses} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
-    // 验证两门课程都显示
-    expect(screen.getByText('高等数学')).toBeInTheDocument();
-    expect(screen.getByText('线性代数')).toBeInTheDocument();
+    // 新版本同时渲染桌面端网格 + 移动端滚动，因此课程名出现两次
+    expect(screen.getAllByText('高等数学').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('线性代数').length).toBeGreaterThanOrEqual(1);
 
     // 显示时间信息
-    expect(screen.getByText('08:00')).toBeInTheDocument();
-    expect(screen.getByText('10:00')).toBeInTheDocument();
+    expect(screen.getAllByText('08:00').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('10:00').length).toBeGreaterThanOrEqual(1);
   });
 
   it('点击编辑按钮触发 onEdit 回调', () => {

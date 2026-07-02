@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TimePicker from './TimePicker';
 
 /**
  * 课程表单对话框组件
@@ -92,20 +93,6 @@ export default function CourseForm({ open, course, onSave, onClose }) {
   const handleClose = () => {
     setErrors({});
     onClose();
-  };
-
-  /**
-   * 生成每天的时间选项
-   */
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let h = 0; h < 24; h++) {
-      for (let m = 0; m < 60; m += 5) {
-        const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        options.push(val);
-      }
-    }
-    return options;
   };
 
   const dayLabels = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -216,17 +203,10 @@ export default function CourseForm({ open, course, onSave, onClose }) {
             >
               上课时间
             </label>
-            <select
+            <TimePicker
               value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="input-glass"
-            >
-              {generateTimeOptions().map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setTime(val)}
+            />
             {errors.time && (
               <div className="text-xs mt-1.5 font-medium" style={{ color: '#ef4444' }}>
                 {errors.time}

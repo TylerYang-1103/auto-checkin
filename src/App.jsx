@@ -237,23 +237,27 @@ export default function App() {
       </header>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto px-5 py-5 pb-28 page-enter">
-        {/* CheckinStatus */}
-        <CheckinStatus
-          nextCourse={nextCourse}
-          countdown={countdown}
-          isChecking={isChecking}
-          onRequestLocation={handleRequestLocation}
-          locationGranted={locationGranted}
-          position={position}
-        />
+      <main className="page-enter">
+        {/* CheckinStatus: 保持原 max-w-2xl 容器 */}
+        <section className="max-w-2xl mx-auto px-5 py-5">
+          <CheckinStatus
+            nextCourse={nextCourse}
+            countdown={countdown}
+            isChecking={isChecking}
+            onRequestLocation={handleRequestLocation}
+            locationGranted={locationGranted}
+            position={position}
+          />
+        </section>
 
-        {/* CourseList */}
-        <CourseList
-          courses={courses}
-          onEdit={handleOpenEdit}
-          onDelete={handleDeleteCourse}
-        />
+        {/* CourseList: 更宽敞的容器，避免 7 列拥挤 */}
+        <section className="max-w-7xl mx-auto px-5 pb-28">
+          <CourseList
+            courses={courses}
+            onEdit={handleOpenEdit}
+            onDelete={handleDeleteCourse}
+          />
+        </section>
       </main>
 
       {/* 底部定位信息 — 毛玻璃栏 */}
